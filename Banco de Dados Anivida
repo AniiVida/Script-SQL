@@ -1,0 +1,180 @@
+CREATE DATABASE Anivida;
+
+USE Anivida;
+
+CREATE TABLE Atendente (
+id_atendente INT NOT NULL UNIQUE PRIMARY KEY,
+id_clinica INT NOT NULL UNIQUE,
+telefone CHAR(11) NOT NULL,
+nome VARCHAR(45) NOT NULL,
+sobrenome VARCHAR(45) NOT NULL,
+cpf CHAR(11) NOT NULL UNIQUE
+);
+
+ALTER TABLE Atendente
+ADD FOREIGN KEY (id_clinica) REFERENCES Clinica (id_clinica);
+
+CREATE TABLE Empresario (
+id_empresario INT NOT NULL UNIQUE PRIMARY KEY,
+nome VARCHAR(45) NOT NULL,
+sobrenome VARCHAR(45) NOT NULL,
+cpf CHAR(11) NOT NULL UNIQUE,
+telefone CHAR(11) NOT NULL
+);
+
+CREATE TABLE Clinica (
+id_clinica INT NOT NULL UNIQUE PRIMARY KEY,
+id_endereço INT NOT NULL UNIQUE,
+id_empresario INT NOT NULL UNIQUE,
+nome VARCHAR(45) NOT NULL,
+site VARCHAR(45) NOT NULL UNIQUE,
+telefone CHAR(11) NOT NULL,
+email VARCHAR(45) NOT NULL
+);
+
+ALTER TABLE Clinica
+ADD FOREIGN KEY (id_endereço) REFERENCES Endereço (id_endereço),
+ADD FOREIGN KEY (id_empresario) REFERENCES Empresario (id_empresario);
+
+CREATE TABLE Endereço (
+id_endereço INT NOT NULL UNIQUE PRIMARY KEY,
+logradouro VARCHAR(45) NOT NULL,
+tipo_logradouro VARCHAR(45) NOT NULL,
+numero VARCHAR(45) NOT NULL,
+complemento VARCHAR(45) NOT NULL,
+cidade VARCHAR(45) NOT NULL,
+estado VARCHAR(45) NOT NULL,
+cep VARCHAR(45) NOT NULL,
+bairro VARCHAR(45) NOT NULL 
+);
+
+CREATE TABLE Veterinario (
+CRMV_veterinario INT NOT NULL UNIQUE PRIMARY KEY,
+cpf CHAR(11) NOT NULL UNIQUE,
+nome VARCHAR(45) NOT NULL,
+cadastro VARCHAR(45) NOT NULL
+);
+
+CREATE TABLE Produto (
+id_produto INT NOT NULL UNIQUE PRIMARY KEY,
+id_fornecedor INT NOT NULL,
+id_clinica INT NOT NULL,
+nome VARCHAR(45) NOT NULL,
+peso DECIMAL (3,2) NOT NULL,
+valor DECIMAL (10,2) NOT NULL,
+tamanho DECIMAL (3,2) NOT NULL,
+data_validade DATE NOT NULL 
+);
+
+ALTER TABLE Produto
+ADD FOREIGN KEY (id_fornecedor) REFERENCES Fornecedor (id_endereço),
+ADD FOREIGN KEY (id_clinica) REFERENCES Clinica (id_clinica);
+
+CREATE TABLE Cliente (
+id_cliente INT NOT NULL UNIQUE PRIMARY KEY,
+id_endereço INT NOT NULL UNIQUE,
+id_convenio INT NOT NULL UNIQUE,
+nome VARCHAR(45) NOT NULL,
+sobrenome VARCHAR(45) NOT NULL,
+cpf CHAR(11) NOT NULL UNIQUE,
+telefone CHAR(11) NOT NULL,
+email VARCHAR(45) NOT NULL,
+nascimento DATE NOT NULL,
+idade TINYINT NOT NULL
+);
+
+ALTER TABLE Cliente
+ADD FOREIGN KEY (id_endereço) REFERENCES Endereço (id_endereço),
+ADD FOREIGN KEY (id_convenio) REFERENCES Convenio (id_convenio);
+
+CREATE TABLE Animal (
+id_animal INT NOT NULL UNIQUE PRIMARY KEY,
+id_cliente INT NOT NULL UNIQUE,
+nome VARCHAR(45) NOT NULL,
+raça INT NOT NULL,
+cor VARCHAR(45) NOT NULL,
+peso DECIMAL (3,2) NOT NULL,
+historico_clinico VARCHAR(255) NOT NULL,
+tamanho DECIMAL (3,2) NOT NULL,
+idade TINYINT NOT NULL 
+);
+
+ALTER TABLE Animal
+ADD FOREIGN KEY (id_cliente) REFERENCES Cliente (id_cliente);
+
+
+CREATE TABLE Convenio (
+id_convenio INT NOT NULL UNIQUE PRIMARY KEY,
+id_valor_convenio INT NOT NULL UNIQUE,
+data_assinatura DATE NOT NULL,
+vencimento_assinatura DATE NOT NULL
+);
+
+ALTER TABLE Convenio
+ADD FOREIGN KEY (id_valor_convenio) REFERENCES Valor_convenio (id_valor_convenio);
+
+
+CREATE TABLE Valor_convenio (
+id_valor_convenio INT NOT NULL UNIQUE PRIMARY KEY,
+valor_mensal DECIMAL (3,2) NOT NULL,
+valor_anual DECIMAL (3,2) NOT NULL
+);
+
+CREATE TABLE Historico_atendimento (
+id_Historico_atendimento INT NOT NULL UNIQUE PRIMARY KEY,
+id_atendente INT NOT NULL UNIQUE PRIMARY KEY,
+id_cliente INT NOT NULL UNIQUE PRIMARY KEY
+);
+
+ALTER TABLE Historico_atendimento
+ADD FOREIGN KEY (id_atendente) REFERENCES Atendente (id_atendente),
+ADD FOREIGN KEY (id_cliente) REFERENCES Cliente (id_cliente);
+
+CREATE TABLE Escala_de_trabalho (
+CRMV_veterinario INT NOT NULL UNIQUE PRIMARY KEY,
+id_clinica INT NOT NULL UNIQUE PRIMARY KEY,
+dia DATE NOT NULL,
+hora_chegada TIME NOT NULL,
+hora_saida TIME NOT NULL 
+);
+
+ALTER TABLE Escala_de_trabalho
+ADD FOREIGN KEY (CRMV_veterinario) REFERENCES Veterinario (CRMV_veterinario),
+ADD  FOREIGN KEY (id_clinica) REFERENCES Clinica (id_clinica);
+
+CREATE TABLE Fornecedor (
+id_fornecedor INT NOT NULL UNIQUE PRIMARY KEY,
+id_endereço INT NOT NULL UNIQUE,,
+nome VARCHAR(45) NOT NULL,
+telefone CHAR(11) NOT NULL,
+email VARCHAR(45) NOT NULL,
+valor DECIMAL (10,2) NOT NULL 
+);
+
+ALTER TABLE Fornecedor
+ADD FOREIGN KEY (id_endereço) REFERENCES Endereço (id_endereço);
+
+CREATE TABLE Agendamentos (
+data_hora_inicio DATETIME NOT NULL UNIQUE PRIMARY KEY,
+CRMV_veterinario INT NOT NULL UNIQUE PRIMARY KEY,
+id_animal INT NOT NULL UNIQUE PRIMARY KEY,
+data_hora_fim_previsto DATETIME NOT NULL UNIQUE
+);
+
+ALTER TABLE Agendamentos
+ADD FOREIGN KEY (CRMV_veterinario) REFERENCES Veterinario (CRMV_veterinario),
+ADD FOREIGN KEY (id_cliente) REFERENCES Cliente (id_cliente);
+
+CREATE TABLE Historico_de_consultas (
+CRMV_veterinario INT NOT NULL UNIQUE PRIMARY KEY,
+id_animal INT NOT NULL UNIQUE PRIMARY KEY,
+data_hora_inicio DATETIME NOT NULL UNIQUE PRIMARY KEY,
+data_hora_agendado DATETIME NOT NULL,
+valor VARCHAR(45) NOT NULL,
+data_hora_fim DATETIME NOT NULL,
+relatorio VARCHAR(255) NOT NULL 
+);
+
+ALTER TABLE Historico_de_consultas
+ADD FOREIGN KEY (CRMV_veterinario) REFERENCES Veterinario (CRMV_veterinario),
+ADD FOREIGN KEY (id_animal) REFERENCES Animal (id_animal);
